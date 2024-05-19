@@ -2,7 +2,7 @@
 /starter_code/target/
 */target/**
 ## removed target/ in order to deploy from docker image
-
+target/
 ### STS ###
 
 .apt_generated

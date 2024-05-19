@@ -32,7 +32,8 @@ public class UserController {
 	
 	@Autowired
 	private CartRepository cartRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	private  BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
