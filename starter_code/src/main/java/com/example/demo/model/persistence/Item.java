@@ -18,6 +18,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Table(name = "item")
 public class Item {
 
+	@Override
+	public String toString() {
+		return "Item{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", price=" + price +
+				", description='" + description + '\'' +
+				'}';
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonProperty
