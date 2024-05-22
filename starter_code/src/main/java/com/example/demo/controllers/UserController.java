@@ -20,13 +20,14 @@ import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-@Slf4j
 public class UserController {
-	
+	Logger log= LogManager.getLogger(UserController.class);
+
 	@Autowired
 	private UserRepository userRepository;
 	
@@ -36,30 +37,42 @@ public class UserController {
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
+
 		return ResponseEntity.of(userRepository.findById(id));
 	}
 	
 	@GetMapping("/{username}")
 	public ResponseEntity<User> findByUserName(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
-		return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+		if(user == null) {
+			log.error("UserController:findByUserName User {} ",username+" was not found");
+			return ResponseEntity.notFound().build();
+		}
+		return  ResponseEntity.ok(user);
 	}
 	
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
-		User user = new User();
-		user.setUsername(createUserRequest.getUsername());
-		Cart cart = new Cart();
-		cartRepository.save(cart);
-		user.setCart(cart);
-		if(createUserRequest.getPassword().length()<7 ||
-				!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
-			log.error("Error - Either length is less than 7 or pass and conf pass do not match. Unable to create {}",createUserRequest.getUsername());
+		try {
+			User user = new User();
+			user.setUsername(createUserRequest.getUsername());
+			Cart cart = new Cart();
+			cartRepository.save(cart);
+			user.setCart(cart);
+			if (createUserRequest.getPassword().length() < 7 ||
+					!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
+				log.error("CreateUserFail Error - Either length is less than 7 or pass and conf pass do not match. Unable to create {}", createUserRequest.getUsername());
+				return ResponseEntity.badRequest().build();
+			}
+			user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
+			userRepository.save(user);
+
+			log.info("CreateUserSuccess User {} ", user.getUsername()+" was created successfully");
+			return ResponseEntity.ok(user);
+		}catch (Exception e){
+			log.error("CreateUserFail Error in creating user {}",e.getMessage());
 			return ResponseEntity.badRequest().build();
 		}
-		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
-		userRepository.save(user);
-		return ResponseEntity.ok(user);
 	}
 	
 }
