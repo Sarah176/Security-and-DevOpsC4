@@ -1,30 +1,18 @@
-.idea/
-/starter_code/target/
-*/target/**
-## removed target/ in order to deploy from docker image
+HELP.md
 target/
+starter_code/target
+
 ### STS ###
-
 .apt_generated
-
 .classpath
-
 .factorypath
-
 .project
-
 .settings
-
 .springBeans
-
 .sts4-cache
 
 ### IntelliJ IDEA ###
-
 .idea
-
 *.iws
-
 *.iml
-
 *.ipr

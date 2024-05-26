@@ -25,14 +25,14 @@ public class UserControllerTest {
 
     private final CartRepository cartRepository = mock(CartRepository.class);
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
+    private final BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
 
     @Before
     public void setup(){
         userController = new UserController();
         TestUtils.injectObjects(userController,"userRepository",userRepository);
         TestUtils.injectObjects(userController,"cartRepository",cartRepository);
-        TestUtils.injectObjects(userController,"bCryptPasswordEncoder",bCryptPasswordEncoder);
+        TestUtils.injectObjects(userController,"bCryptPasswordEncoder",encoder);
     }
     @Test
     public void testCreateUser(){
@@ -50,6 +50,35 @@ public class UserControllerTest {
         Assert.assertNotNull(user);
         Assert.assertEquals(0,user.getId());
         Assert.assertEquals("test",user.getUsername());
+
+    }
+    @Test
+    public void testCreateUserUnmatchedPassword(){
+        CreateUserRequest request = new CreateUserRequest();
+        request.setUsername("test");
+        request.setPassword("1234567");
+        request.setConfirmPassword("1234568");
+
+        final ResponseEntity<User> response = userController.createUser(request);
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(400,response.getStatusCodeValue());
+
+    }
+    @Test
+    public void testFindByUserName(){
+        CreateUserRequest request = new CreateUserRequest();
+        request.setUsername("test");
+        request.setPassword("1234567");
+        request.setConfirmPassword("1234567");
+
+        final ResponseEntity<User> response1 = userController.createUser(request);
+        Assert.assertEquals(200,response1.getStatusCodeValue());
+
+        final ResponseEntity<User> response2 = userController.findByUserName("test");
+        Assert.assertNotNull(response2);
+        Assert.assertEquals(200,response2.getStatusCodeValue());
+        Assert.assertEquals("test",response2.getBody().getUsername());
 
     }
 }
