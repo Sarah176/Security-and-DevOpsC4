@@ -14,7 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -74,11 +77,46 @@ public class UserControllerTest {
 
         final ResponseEntity<User> response1 = userController.createUser(request);
         Assert.assertEquals(200,response1.getStatusCodeValue());
-
+        when(userRepository.findByUsername("test")).thenReturn(response1.getBody());
         final ResponseEntity<User> response2 = userController.findByUserName("test");
         Assert.assertNotNull(response2);
         Assert.assertEquals(200,response2.getStatusCodeValue());
         Assert.assertEquals("test",response2.getBody().getUsername());
+
+    }
+    @Test
+    public void testFindByUserNameUserNotFound(){
+
+        final ResponseEntity<User> response1 = userController.findByUserName("test");
+        Assert.assertNotNull(response1);
+        Assert.assertEquals(404,response1.getStatusCodeValue());
+        Assert.assertNull(response1.getBody());
+
+    }
+    @Test
+    public void testFindById(){
+        CreateUserRequest request = new CreateUserRequest();
+        request.setUsername("test");
+        request.setPassword("1234567");
+        request.setConfirmPassword("1234567");
+
+        final ResponseEntity<User> response1 = userController.createUser(request);
+        Assert.assertEquals(200,response1.getStatusCodeValue());
+
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(response1.getBody()));
+        final ResponseEntity<User> response2 = userController.findById(1L);
+        Assert.assertNotNull(response2);
+        Assert.assertEquals(200,response2.getStatusCodeValue());
+        Assert.assertEquals("test",response2.getBody().getUsername());
+
+    }
+    @Test
+    public void testFindByIdUserNotFound(){
+
+        final ResponseEntity<User> response1 = userController.findById(1L);
+        Assert.assertNotNull(response1);
+        Assert.assertEquals(404,response1.getStatusCodeValue());
+        Assert.assertNull(response1.getBody());
 
     }
 }
