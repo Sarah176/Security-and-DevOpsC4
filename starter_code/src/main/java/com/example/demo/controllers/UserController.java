@@ -1,9 +1,6 @@
 package com.example.demo.controllers;
 
 import java.util.Optional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 @RestController
 @RequestMapping("/api/user")
-@RequiredArgsConstructor
 public class UserController {
 	Logger log= LogManager.getLogger(UserController.class);
 
@@ -33,7 +29,8 @@ public class UserController {
 	
 	@Autowired
 	private CartRepository cartRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	private  BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
